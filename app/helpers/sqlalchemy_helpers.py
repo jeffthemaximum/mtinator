@@ -51,30 +51,23 @@ def log_status_change(line, status, previous_status):
 
 
 def cache_status_change(line, status, db):
-    status = Status.query.filter_by(line_id=line.id).order_by(
-        Status.create_time.desc()).first()
-
     if status is not None:
         status_name = status.name
-        if status_name == 'not delayed':
-            previous_delayed_status = Status.query.filter_by(
-                line_id=line.id, name='delayed').order_by(Status.create_time.desc()).first()
-
-            previous_status = Status.query.filter(
+        previous_status = Status.query.filter(
                 Status.create_time < status.create_time, Status.line_id == status.line_id).order_by(Status.create_time.desc()).first()
 
-            should_cache = (
-                previous_delayed_status is not None and
+        should_cache = (
+            status_name == 'delayed' or
+            (
+                status_name == 'not delayed' and
                 previous_status is not None and
-                previous_delayed_status.id == previous_status.id
+                previous_status.name == 'delayed'
             )
+        )
 
-            if should_cache is True:
-                previous_delayed_status_time = previous_delayed_status.create_time
-                status_time = status.create_time
-                diff = status_time - previous_delayed_status_time
-                diff_seconds = diff.total_seconds()
-                cached_downtime = line.down_time
-                line.down_time = cached_downtime + diff_seconds
-                db.session.add(line)
-                db.session.commit()
+        if should_cache is True:
+            diff = status.create_time - previous_status.create_time
+            diff_seconds = diff.total_seconds()
+            line.down_time += diff_seconds
+            db.session.add(line)
+            db.session.commit()
