@@ -14,6 +14,8 @@ A small web service that does the following things:
     - This has only been run against 3.7.4. It will likely work with 3.6+, but that's a guess at this point.
 - sqlite 3.24.0
     - Similar to above, it has only been tested with 3.24.0, but likely works with other versions
+- a valid MTA api key
+    - register at https://datamine.mta.info
 
 # To run
 - clone the repo
@@ -22,6 +24,7 @@ A small web service that does the following things:
 ```
 pip install -r requirements.txt
 export FLASK_APP=application.py
+export MTA_API_KEY={your valid MTA api key}
 flask db upgrade
 flask run
 ```
