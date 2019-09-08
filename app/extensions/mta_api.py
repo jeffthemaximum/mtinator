@@ -1,4 +1,5 @@
 from google.transit import gtfs_realtime_pb2
+from urllib.error import URLError
 from urllib.request import urlopen
 
 from app.helpers.line_data import all_lines, line_to_feed_id
@@ -9,7 +10,13 @@ from app.helpers.sqlalchemy_helpers import get_or_create, update_line_and_status
 
 def get_data(feed_id):
     feed = gtfs_realtime_pb2.FeedMessage()
-    response = urlopen(feed_id_to_url(feed_id))
+
+    try:
+        response = urlopen(feed_id_to_url(feed_id))
+    except URLError as e:
+        print(f"Error in mta_api.get_data; feed_id: {feed_id}; error: {e}")
+        return None
+
     feed.ParseFromString(response.read())
     for entity in feed.entity:
         if entity.HasField('alert'):
