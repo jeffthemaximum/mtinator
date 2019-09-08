@@ -1,6 +1,6 @@
 # mtinator
 
-Mtinator (pronouced em-tinator) is my _attempt_ to crate the following:
+Mtinator (pronouced em-tinator) is my _attempt_ to create the following:
 
 A small web service that does the following things:
 - Continuously monitors the status of MTA service to see whether a line is delayed or not.
